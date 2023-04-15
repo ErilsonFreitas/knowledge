@@ -1,47 +1,53 @@
 module.exports = app => {
-    const {existsOrError, notExistsorError} = app.api.validation
+    const { existsOrError, notExistsOrError } = app.api.validation
 
-    const save = (req,res) => {
-        const category = { ...req.body }
-        if(req.params.id) category.id = req.params.id
+    const save = (req, res) => {
+        const category = {
+            id: req.body.id,
+            name: req.body.name,
+            parentId: req.body.parentId
+        }
 
-        try{
+        if (req.params.id) category.id = req.params.id
+
+        try {
             existsOrError(category.name, 'Nome não informado')
-        }catch(msg){
+        } catch (msg) {
             return res.status(400).send(msg)
         }
 
-        if(category.id){
+        if (category.id) {
             app.db('categories')
                 .update(category)
-                .where({id: category.id})
-                .then( _ => res.status(204).send())
+                .where({ id: category.id })
+                .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
-        }else {
+        } else {
             app.db('categories')
                 .insert(category)
-                .then( _ => res.status(204).send())
+                .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         }
     }
 
-    const remove = async (req,res) => {
-        try{
+    const remove = async (req, res) => {
+        try {
             existsOrError(req.params.id, 'Código da categoria não informado.')
 
             const subcategory = await app.db('categories')
-                .where({parentId: req.params.id})
+                .where({ parentId: req.params.id })
+            notExistsOrError(subcategory, 'Categoria possui subcategorias.')
 
             const articles = await app.db('articles')
-                where({categoryId: req.params.id})
-            notExistsorError(articles, 'Categoria Possui Artigos.')
-        
+                .where({ categoryId: req.params.id })
+            notExistsOrError(articles, 'Categoria Possui Artigos.')
+
             const rowsDeleted = await app.db('categories')
-                .where({id: req.params.id}).del()
+                .where('id',req.params.id).del()
             existsOrError(rowsDeleted, 'Categoria não foi encontrada')
 
             res.status(204).send()
-        }catch(msg){
+        } catch (msg) {
             res.status(400).send(msg)
         }
     }
@@ -56,7 +62,7 @@ module.exports = app => {
             let path = category.name
             let parent = getParent(categories, category.parentId)
 
-            while(parent) {
+            while (parent) {
                 path = `${parent.name} > ${path}`
                 parent = getParent(categories, parent.parentId)
             }
@@ -65,8 +71,8 @@ module.exports = app => {
         })
 
         categoriesWithPath.sort((a, b) => {
-            if(a.path < b.path) return -1
-            if(a.path > b.path) return 1
+            if (a.path < b.path) return -1
+            if (a.path > b.path) return 1
             return 0
         })
 
@@ -88,7 +94,7 @@ module.exports = app => {
     }
 
     const toTree = (categories, tree) => {
-        if(!tree) tree = categories.filter(c => !c.parentId)
+        if (!tree) tree = categories.filter(c => !c.parentId)
         tree = tree.map(parentNode => {
             const isChild = node => node.parentId == parentNode.id
             parentNode.children = toTree(categories, categories.filter(isChild))

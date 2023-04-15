@@ -50,7 +50,7 @@ module.exports = app => {
         }
     }
 
-    const limit = 10 //usado para paginação
+    const limit = 3 //usado para paginação
     const get = async (req, res) => {
         const page = req.query.page || 1
 
@@ -60,7 +60,7 @@ module.exports = app => {
         app.db('articles')
             .select('id', 'name', 'description')
             .limit(limit).offset(page * limit - limit)
-            .then(articles => res.json({data: articles, count, limit}))
+            .then(articles => res.json({ data: articles, count, limit }))
             .catch(err => res.status(500).send(err))
     }
 
