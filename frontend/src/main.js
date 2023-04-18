@@ -6,7 +6,7 @@ import router from './config/router'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import BootstrapVue from 'bootstrap-vue'
-import axios from 'axios'
+import './config/axios'
 import Toasted from 'vue-toasted'
 import msgs from '@/config/msgs'
 

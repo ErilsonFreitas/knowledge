@@ -19,14 +19,18 @@ module.exports = app => {
         
         //pegando a data atual a partir de 1970 convertida pra segundos
         const now = Math.floor(Date.now() / 1000)
-
+        const dt = new Date
+        const horaAtual = (dt.getHours() * 60 * 60)+(dt.getMinutes() * 60)+(dt.getSeconds())
+        const restoDoDia = 86400 - horaAtual
+        console.log(restoDoDia)
         const payload = {
             id: user.id,
             name: user.name,
             email: user.email,
             admin: user.admin,
             iat: now, // iat Significa "issued at" == "Emitido em"
-            exp: now + (60 * 60 * 24 * 3) //validade do token de 3 dias
+            //exp: now + (60 * 60 * 24 * 3) //validade do token de 3 dias
+            exp: now + (restoDoDia + 7200) //Token Expirando 2h da manha
 
         }
 

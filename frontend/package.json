@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "serve": "vite serve",
     "build": "vite build",
-    "preview": "vite preview"
+    "lint": "vite lint"
   },
   "dependencies": {
     "@vue/compat": "^3.2.47",
